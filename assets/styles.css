@@ -226,7 +226,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .legal-section { padding-block: 72px; border-block: 1px solid var(--line); background: #f4f9ff; }
 .legal-grid { display: grid; grid-template-columns: 1fr 1.12fr; gap: 48px 80px; align-items: center; }
 .legal-brand-banner { grid-column: 1 / -1; margin: 0; padding: clamp(8px, 1.5vw, 16px); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--white); box-shadow: 0 18px 50px rgba(2,61,121,.09); }
-.legal-brand-banner img { display: block; width: 100%; height: auto; border-radius: calc(var(--radius-lg) - 9px); }
+.legal-brand-banner img { display: block; width: 100%; aspect-ratio: 1280 / 514; object-fit: cover; object-position: center top; border-radius: calc(var(--radius-lg) - 9px); }
 .legal-heading { display: flex; align-items: center; gap: 22px; }
 .legal-heading .eyebrow { margin-bottom: 10px; }
 .legal-heading h2 { font-size: clamp(1.8rem, 3vw, 2.65rem); }
