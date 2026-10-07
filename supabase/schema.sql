@@ -6,6 +6,7 @@ create table if not exists public.consultation_requests (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   name text not null check (char_length(name) between 2 and 100),
+  email text not null check (email ~* '^[A-Z0-9._%+-]+@gmail\\.com$'),
   phone text not null check (char_length(phone) between 9 and 20),
   market text not null check (char_length(market) between 2 and 100),
   message text not null default '' check (char_length(message) <= 1500),
@@ -16,6 +17,8 @@ create table if not exists public.consultation_requests (
   zalo_notified boolean not null default false,
   zalo_error text
 );
+
+alter table public.consultation_requests add column if not exists email text;
 
 create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
