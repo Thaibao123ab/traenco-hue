@@ -59,7 +59,7 @@ function getFilteredLeads() {
   const status = statusFilter.value;
   return leads.filter((lead) => {
     const matchesStatus = status === 'all' || lead.status === status;
-    const haystack = [lead.name, lead.phone, lead.market, lead.message].join(' ').toLocaleLowerCase('vi');
+    const haystack = [lead.name, lead.email, lead.phone, lead.market, lead.message].join(' ').toLocaleLowerCase('vi');
     return matchesStatus && (!query || haystack.includes(query));
   });
 }
@@ -77,6 +77,9 @@ function renderLeads() {
     const phone = row.querySelector('.lead-phone');
     phone.textContent = lead.phone;
     phone.href = `tel:${lead.phone.replace(/\D/g, '')}`;
+    const email = row.querySelector('.lead-email');
+    email.textContent = lead.email || '—';
+    email.href = lead.email ? `mailto:${lead.email}` : '#';
     row.querySelector('.lead-market').textContent = lead.market;
     row.querySelector('.lead-message').textContent = lead.message || '—';
     const zalo = row.querySelector('.lead-zalo');
@@ -142,10 +145,10 @@ document.querySelector('#refresh-button').addEventListener('click', loadLeads);
 searchInput.addEventListener('input', renderLeads);
 statusFilter.addEventListener('change', renderLeads);
 document.querySelector('#export-button').addEventListener('click', () => {
-  const header = ['Thời gian', 'Họ tên', 'Số điện thoại', 'Thị trường', 'Lời nhắn', 'Trạng thái', 'Đã báo Zalo'];
+  const header = ['Thời gian', 'Họ tên', 'Gmail', 'Số điện thoại', 'Thị trường', 'Lời nhắn', 'Trạng thái', 'Đã báo Zalo'];
   const lines = [header.map(escapeCsv).join(',')];
   getFilteredLeads().forEach((lead) => lines.push([
-    formatDate(lead.created_at), lead.name, lead.phone, lead.market, lead.message, lead.status, lead.zalo_notified ? 'Có' : 'Không'
+    formatDate(lead.created_at), lead.name, lead.email, lead.phone, lead.market, lead.message, lead.status, lead.zalo_notified ? 'Có' : 'Không'
   ].map(escapeCsv).join(',')));
   const blob = new Blob([`\ufeff${lines.join('\n')}`], { type: 'text/csv;charset=utf-8' });
   const link = document.createElement('a');
