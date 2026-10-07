@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@1,6..72,500&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2306377f'/%3E%3Ccircle cx='32' cy='32' r='20' fill='none' stroke='%2362d6ff' stroke-width='3'/%3E%3Cpath d='M13 32h38M32 12c7 6 10 13 10 20s-3 14-10 20M32 12c-7 6-10 13-10 20s3 14 10 20' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="assets/styles.css?v=20261007-3">
+  <link rel="stylesheet" href="assets/styles.css?v=20261008-1">
 </head>
 <body>
   <a class="skip-link" href="#main">Bỏ qua đến nội dung chính</a>
@@ -345,8 +345,8 @@
           </div>
         </div>
 
-        <form class="contact-form reveal" data-delay="100" id="consultation-form">
-          <div class="form-heading"><h3>Đăng ký tư vấn miễn phí</h3><p>Điền 3 thông tin ngắn, chúng tôi sẽ chuẩn bị sẵn nội dung email cho bạn.</p></div>
+        <form class="contact-form reveal" data-delay="100" id="consultation-form" novalidate>
+          <div class="form-heading"><h3>Đăng ký tư vấn miễn phí</h3><p>Thông tin được lưu vào hệ thống để nhân viên TRAENCO Huế liên hệ lại.</p></div>
           <label>Họ và tên<input type="text" name="name" autocomplete="name" required placeholder="Nguyễn Văn A"></label>
           <label>Số điện thoại<input type="tel" name="phone" autocomplete="tel" required inputmode="tel" placeholder="09xx xxx xxx"></label>
           <label>Thị trường quan tâm
@@ -356,8 +356,13 @@
             </select>
           </label>
           <label>Lời nhắn <span>(không bắt buộc)</span><textarea name="message" rows="3" placeholder="Ví dụ: Tôi muốn được tư vấn chương trình phù hợp..."></textarea></label>
-          <button class="button button-primary form-submit" type="submit">Tạo yêu cầu tư vấn</button>
-          <p class="form-note">Nút trên sẽ mở ứng dụng email của bạn. Hoặc gọi trực tiếp <a href="tel:0941945386">0941 945 386</a>.</p>
+          <label class="consent-row"><input type="checkbox" name="consent" required><span>Tôi đồng ý để TRAENCO Huế lưu thông tin và liên hệ tư vấn.</span></label>
+          <label class="honeypot" aria-hidden="true">Không điền ô này<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          <input type="hidden" name="formStartedAt" value="">
+          <button class="button button-primary form-submit" type="submit"><span class="submit-label">Gửi yêu cầu tư vấn</span><span class="submit-spinner" aria-hidden="true"></span></button>
+          <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+          <a class="button zalo-after-submit" id="zalo-after-submit" href="https://zalo.me/0935398669" target="_blank" rel="noopener noreferrer" hidden>Nhắn Zalo với tư vấn viên</a>
+          <p class="form-note">Dữ liệu chỉ dùng để tư vấn. Cần hỗ trợ ngay? Gọi <a href="tel:0941945386">0941 945 386</a>.</p>
         </form>
       </div>
     </section>
@@ -373,7 +378,7 @@
         <p>Điểm tư vấn tại Huế thuộc hệ thống Công ty Cổ phần TRAENCO.</p>
       </div>
         <div><h3>Đi nhanh</h3><a href="#opportunities">Cơ hội quốc tế</a><a href="#services">Dịch vụ hỗ trợ</a><a href="#gallery">Hình ảnh thực tế</a><a href="#about">Về TRAENCO</a></div>
-      <div><h3>Liên hệ</h3><a href="tel:0941945386">0941 945 386</a><span>275 Phạm Văn Đồng,<br>P. Mỹ Thượng, Huế</span></div>
+      <div><h3>Liên hệ</h3><a href="tel:0941945386">0941 945 386</a><span>275 Phạm Văn Đồng,<br>P. Mỹ Thượng, Huế</span><a class="admin-entry" href="admin/">Quản trị đăng ký</a></div>
     </div>
     <div class="shell footer-bottom"><span>© <span id="year"></span> TRAENCO Huế</span><span>Thông tin được trình bày cho mục đích tư vấn ban đầu; điều kiện cụ thể được xác nhận theo từng hồ sơ.</span></div>
   </footer>
@@ -389,6 +394,7 @@
     <p></p>
   </dialog>
 
-  <script src="assets/script.js" defer></script>
+  <script src="assets/config.js"></script>
+  <script src="assets/script.js?v=20261008-1" defer></script>
 </body>
 </html>
