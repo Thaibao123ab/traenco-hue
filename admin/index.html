@@ -27,14 +27,12 @@
     <section class="login-view" id="login-view">
       <form class="login-card" id="login-form">
         <span class="eyebrow">Dành cho nhân viên</span>
-        <h1>Đăng nhập quản trị</h1>
-        <p>Xem, tìm kiếm và cập nhật trạng thái các yêu cầu tư vấn từ website.</p>
+        <h1>Quản trị bằng Gmail</h1>
+        <p>Đăng bài, xem khách đăng ký và cập nhật trạng thái tư vấn bằng tài khoản Google được cấp quyền.</p>
         <div class="setup-warning" id="setup-warning" hidden>
-          Hệ thống dữ liệu chưa được kết nối. Hãy điền Supabase URL và Anon Key trong <code>assets/config.js</code>.
+          Cổng quản trị đã được chuẩn bị. Gmail chủ sở hữu sẽ được bổ sung sau để kích hoạt đăng nhập.
         </div>
-        <label>Email<input type="email" name="email" autocomplete="username" required placeholder="nhanvien@traenco.vn"></label>
-        <label>Mật khẩu<input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="••••••••"></label>
-        <button class="button button-primary" type="submit">Đăng nhập</button>
+        <button class="button button-primary" id="google-admin-button" type="button">Đăng nhập bằng Google</button>
         <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
         <a class="back-link" href="../">← Trở về website</a>
       </form>
@@ -86,7 +84,6 @@
   </template>
 
   <script src="../assets/config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="admin.js?v=20261008-1" defer></script>
+  <script src="admin.js?v=20261008-2" defer></script>
 </body>
 </html>
