@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#064b93">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Quản trị đăng ký | TRAENCO Huế</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=20261008-1">
+</head>
+<body>
+  <header class="admin-header">
+    <a class="admin-brand" href="../">
+      <img src="../assets/logo-traenco-tralexce.png" alt="Logo TRAENCO">
+      <span><strong>TRAENCO HUẾ</strong><small>Quản trị đăng ký tư vấn</small></span>
+    </a>
+    <div class="header-actions">
+      <span id="admin-email"></span>
+      <button class="button button-light" id="logout-button" type="button" hidden>Đăng xuất</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="login-view" id="login-view">
+      <form class="login-card" id="login-form">
+        <span class="eyebrow">Dành cho nhân viên</span>
+        <h1>Đăng nhập quản trị</h1>
+        <p>Xem, tìm kiếm và cập nhật trạng thái các yêu cầu tư vấn từ website.</p>
+        <div class="setup-warning" id="setup-warning" hidden>
+          Hệ thống dữ liệu chưa được kết nối. Hãy điền Supabase URL và Anon Key trong <code>assets/config.js</code>.
+        </div>
+        <label>Email<input type="email" name="email" autocomplete="username" required placeholder="nhanvien@traenco.vn"></label>
+        <label>Mật khẩu<input type="password" name="password" autocomplete="current-password" required minlength="6" placeholder="••••••••"></label>
+        <button class="button button-primary" type="submit">Đăng nhập</button>
+        <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
+        <a class="back-link" href="../">← Trở về website</a>
+      </form>
+    </section>
+
+    <section class="dashboard" id="dashboard" hidden>
+      <div class="dashboard-heading">
+        <div><span class="eyebrow">Dữ liệu tư vấn</span><h1>Yêu cầu từ khách hàng</h1></div>
+        <button class="button button-export" id="export-button" type="button">Xuất file CSV</button>
+      </div>
+
+      <div class="stat-grid" aria-label="Thống kê đăng ký">
+        <article><span>Tổng đăng ký</span><strong id="stat-total">0</strong></article>
+        <article><span>Mới nhận</span><strong id="stat-new">0</strong></article>
+        <article><span>Đang tư vấn</span><strong id="stat-contacted">0</strong></article>
+        <article><span>Đã chốt</span><strong id="stat-enrolled">0</strong></article>
+      </div>
+
+      <div class="toolbar">
+        <label class="search-field"><span class="sr-only">Tìm kiếm</span><input type="search" id="search-input" placeholder="Tìm tên, số điện thoại, nội dung…"></label>
+        <label><span class="sr-only">Lọc trạng thái</span><select id="status-filter"><option value="all">Tất cả trạng thái</option><option value="new">Mới nhận</option><option value="contacted">Đang tư vấn</option><option value="enrolled">Đã chốt</option><option value="closed">Đã đóng</option></select></label>
+        <button class="button button-refresh" id="refresh-button" type="button">Làm mới</button>
+      </div>
+
+      <div class="table-card">
+        <div class="loading-state" id="loading-state">Đang tải dữ liệu…</div>
+        <div class="empty-state" id="empty-state" hidden>Chưa có đăng ký phù hợp.</div>
+        <div class="table-scroll" id="table-scroll" hidden>
+          <table>
+            <thead><tr><th>Thời gian</th><th>Khách hàng</th><th>Quan tâm</th><th>Lời nhắn</th><th>Zalo</th><th>Trạng thái</th></tr></thead>
+            <tbody id="lead-rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <p class="dashboard-note">Dữ liệu cá nhân chỉ dùng cho mục đích tư vấn và chỉ tài khoản quản trị được cấp quyền mới có thể xem.</p>
+    </section>
+  </main>
+
+  <template id="lead-row-template">
+    <tr>
+      <td class="lead-time"></td>
+      <td><strong class="lead-name"></strong><a class="lead-phone"></a></td>
+      <td class="lead-market"></td>
+      <td class="lead-message"></td>
+      <td class="lead-zalo"></td>
+      <td><select class="lead-status" aria-label="Cập nhật trạng thái"><option value="new">Mới nhận</option><option value="contacted">Đang tư vấn</option><option value="enrolled">Đã chốt</option><option value="closed">Đã đóng</option></select></td>
+    </tr>
+  </template>
+
+  <script src="../assets/config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js?v=20261008-1" defer></script>
+</body>
+</html>
