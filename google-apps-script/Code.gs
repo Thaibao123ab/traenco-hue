@@ -1,4 +1,6 @@
 const SHEET_NAME = 'Dang ky tu van';
+const POSTS_SHEET = 'Bai viet';
+const ADMINS_SHEET = 'Quan tri';
 const STAFF_EMAIL = 'xkldtraenco@gmail.com';
 
 function doPost(event) {
@@ -31,8 +33,52 @@ function doPost(event) {
   }
 }
 
+function doGet(event) {
+  if (event && event.parameter && event.parameter.action === 'posts') {
+    return json_({ ok: true, posts: getPublishedPosts_() });
+  }
+  const email = Session.getActiveUser().getEmail().toLowerCase();
+  if (!email || !isAdmin_(email)) {
+    return HtmlService.createHtmlOutput('<h2>Chưa được cấp quyền</h2><p>Hãy gửi Gmail này cho chủ website để được thêm vào danh sách quản trị.</p>');
+  }
+  return HtmlService.createTemplateFromFile('Admin').evaluate().setTitle('Quản trị TRAENCO Huế').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
 function setupSheet() {
   getSheet_();
+  getPostsSheet_();
+  getAdminsSheet_();
+}
+
+function getAdminData() {
+  requireAdmin_();
+  const leads = getSheet_().getDataRange().getValues().slice(1).reverse().map((row, index) => ({
+    row: getSheet_().getLastRow() - index,
+    createdAt: row[0], name: row[1], email: row[2], phone: row[3], market: row[4], message: row[5], status: row[6]
+  }));
+  const posts = getPostsSheet_().getDataRange().getValues().slice(1).reverse().map((row, index) => ({
+    row: getPostsSheet_().getLastRow() - index,
+    createdAt: row[0], title: row[1], summary: row[2], content: row[3], image: row[4], status: row[5], publishedAt: row[6]
+  }));
+  return { email: Session.getActiveUser().getEmail(), leads: leads, posts: posts };
+}
+
+function savePost(post) {
+  requireAdmin_();
+  const sheet = getPostsSheet_();
+  const values = [new Date(), clean_(post.title, 180), clean_(post.summary, 500), clean_(post.content, 10000), clean_(post.image, 1000), post.status === 'published' ? 'published' : 'draft', post.status === 'published' ? new Date() : ''];
+  if (!values[1]) throw new Error('Cần nhập tiêu đề bài viết.');
+  if (Number(post.row) >= 2) sheet.getRange(Number(post.row), 1, 1, values.length).setValues([values]);
+  else sheet.appendRow(values);
+  return getAdminData();
+}
+
+function updateLeadStatus(row, status) {
+  requireAdmin_();
+  const allowed = ['Mới nhận', 'Đang tư vấn', 'Đã chốt', 'Đã đóng'];
+  if (!allowed.includes(status)) throw new Error('Trạng thái không hợp lệ.');
+  getSheet_().getRange(Number(row), 7).setValue(status);
+  return true;
 }
 
 function getSheet_() {
@@ -45,6 +91,50 @@ function getSheet_() {
     sheet.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#064b93').setFontColor('#ffffff');
   }
   return sheet;
+}
+
+function getPostsSheet_() {
+  const file = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = file.getSheetByName(POSTS_SHEET);
+  if (!sheet) sheet = file.insertSheet(POSTS_SHEET);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Tạo lúc', 'Tiêu đề', 'Mô tả ngắn', 'Nội dung', 'Ảnh URL', 'Trạng thái', 'Đăng lúc']);
+    formatHeader_(sheet, 7);
+  }
+  return sheet;
+}
+
+function getAdminsSheet_() {
+  const file = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = file.getSheetByName(ADMINS_SHEET);
+  if (!sheet) sheet = file.insertSheet(ADMINS_SHEET);
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Gmail được phép quản trị']);
+    formatHeader_(sheet, 1);
+    sheet.appendRow(['NHẬP_GMAIL_ADMIN_SAU@gmail.com']);
+  }
+  return sheet;
+}
+
+function getPublishedPosts_() {
+  return getPostsSheet_().getDataRange().getValues().slice(1)
+    .filter(row => row[5] === 'published')
+    .reverse()
+    .map(row => ({ title: row[1], summary: row[2], content: row[3], image: row[4], publishedAt: row[6] }));
+}
+
+function isAdmin_(email) {
+  return getAdminsSheet_().getDataRange().getValues().slice(1).some(row => String(row[0]).trim().toLowerCase() === email);
+}
+
+function requireAdmin_() {
+  const email = Session.getActiveUser().getEmail().toLowerCase();
+  if (!email || !isAdmin_(email)) throw new Error('Tài khoản chưa được cấp quyền quản trị.');
+}
+
+function formatHeader_(sheet, columns) {
+  sheet.setFrozenRows(1);
+  sheet.getRange(1, 1, 1, columns).setFontWeight('bold').setBackground('#064b93').setFontColor('#ffffff');
 }
 
 function clean_(value, maxLength) {

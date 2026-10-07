@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{--blue:#064b93;--dark:#04366c;--red:#d82027;--line:#dce6ef;--bg:#f3f7fa}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#183049;font-family:Arial,sans-serif}header{display:flex;justify-content:space-between;align-items:center;padding:18px 5%;color:#fff;background:var(--dark);border-bottom:4px solid var(--red)}header b{font-size:20px}.wrap{width:min(1200px,92%);margin:32px auto}.tabs{display:flex;gap:8px;margin-bottom:20px}.tabs button,.primary{padding:12px 18px;border:0;border-radius:3px;font-weight:bold;cursor:pointer}.tabs button.active,.primary{color:#fff;background:var(--blue)}.panel{display:none}.panel.active{display:block}.card{padding:24px;background:#fff;box-shadow:0 10px 35px #04366c12}h1,h2{color:var(--dark)}label{display:grid;gap:7px;margin:14px 0;font-size:13px;font-weight:bold}input,textarea,select{width:100%;padding:11px;border:1px solid var(--line);border-radius:3px;font:inherit}table{width:100%;border-collapse:collapse;background:#fff;font-size:13px}th{padding:12px;color:#fff;background:var(--dark);text-align:left}td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.posts{display:grid;gap:10px;margin-top:20px}.post{padding:15px;border-left:4px solid var(--blue);background:#fff}.muted{color:#63768b;font-size:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}.table{overflow:auto}header{align-items:flex-start;flex-direction:column;gap:5px}}
+  </style>
+</head>
+<body>
+  <header><b>TRAENCO HUẾ · QUẢN TRỊ</b><span id="account"></span></header>
+  <main class="wrap">
+    <div class="tabs"><button class="active" data-tab="leads">Khách đăng ký</button><button data-tab="posts">Đăng bài</button></div>
+    <section class="panel active" id="leads"><h1>Danh sách tư vấn</h1><div class="card table"><table><thead><tr><th>Thời gian</th><th>Khách hàng</th><th>Liên hệ</th><th>Nhu cầu</th><th>Trạng thái</th></tr></thead><tbody id="leadRows"></tbody></table></div></section>
+    <section class="panel" id="posts">
+      <div class="grid"><form class="card" id="postForm"><h1>Soạn bài viết</h1><input type="hidden" name="row"><label>Tiêu đề<input name="title" required></label><label>Mô tả ngắn<textarea name="summary" rows="3"></textarea></label><label>Nội dung<textarea name="content" rows="8"></textarea></label><label>Đường dẫn ảnh<input name="image" type="url" placeholder="https://..."></label><label>Trạng thái<select name="status"><option value="draft">Lưu nháp</option><option value="published">Đăng công khai</option></select></label><button class="primary" type="submit">Lưu bài viết</button><p class="muted" id="postStatus"></p></form><div><h2>Bài viết đã tạo</h2><div class="posts" id="postList"></div></div></div>
+    </section>
+  </main>
+  <script>
+    let state={leads:[],posts:[]};
+    document.querySelectorAll('[data-tab]').forEach(button=>button.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===button));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===button.dataset.tab))});
+    function load(){google.script.run.withSuccessHandler(render).withFailureHandler(error=>alert(error.message)).getAdminData()}
+    function render(data){state=data;document.querySelector('#account').textContent=data.email;document.querySelector('#leadRows').innerHTML=data.leads.map(x=>`<tr><td>${new Date(x.createdAt).toLocaleString('vi-VN')}</td><td><b>${safe(x.name)}</b><br>${safe(x.market)}</td><td>${safe(x.email)}<br>${safe(x.phone)}</td><td>${safe(x.message||'—')}</td><td><select onchange="setStatus(${x.row},this.value)">${['Mới nhận','Đang tư vấn','Đã chốt','Đã đóng'].map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select></td></tr>`).join('');document.querySelector('#postList').innerHTML=data.posts.map((x,i)=>`<article class="post"><b>${safe(x.title)}</b><p class="muted">${x.status==='published'?'Đang hiển thị':'Bản nháp'}</p><button onclick="editPost(${i})">Sửa bài</button></article>`).join('')}
+    function safe(value){const div=document.createElement('div');div.textContent=value??'';return div.innerHTML}
+    function setStatus(row,status){google.script.run.withFailureHandler(error=>alert(error.message)).updateLeadStatus(row,status)}
+    function editPost(index){const p=state.posts[index],f=document.querySelector('#postForm');['row','title','summary','content','image','status'].forEach(k=>f.elements[k].value=p[k]??'');scrollTo({top:0,behavior:'smooth'})}
+    document.querySelector('#postForm').onsubmit=event=>{event.preventDefault();const status=document.querySelector('#postStatus');status.textContent='Đang lưu…';const payload=Object.fromEntries(new FormData(event.target));google.script.run.withSuccessHandler(data=>{status.textContent='Đã lưu bài viết.';event.target.reset();render(data)}).withFailureHandler(error=>status.textContent=error.message).savePost(payload)};
+    load();
+  </script>
+</body>
+</html>
