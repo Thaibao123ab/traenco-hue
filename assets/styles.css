@@ -493,6 +493,23 @@ body { color: #24384f; background: #fff; }
 .site-footer { background: #032b58; }
 .button { border-radius: 3px; }
 
+.consent-row { display: flex !important; align-items: flex-start; gap: 10px; color: #42566f; font-size: .78rem; line-height: 1.5; cursor: pointer; }
+.consent-row input { width: 18px; height: 18px; flex: 0 0 auto; margin-top: 2px; accent-color: #064b93; }
+.honeypot { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+.form-submit { position: relative; width: 100%; }
+.form-submit:disabled { cursor: wait; opacity: .78; transform: none; }
+.submit-spinner { display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%; animation: form-spin .7s linear infinite; }
+.form-submit.is-loading .submit-spinner { display: inline-block; }
+.form-status { display: none; padding: 11px 13px; border-radius: 3px; font-size: .78rem; line-height: 1.5; }
+.form-status:not(:empty) { display: block; }
+.form-status.is-success { color: #0b5d37; border: 1px solid #a9dec2; background: #ecfbf3; }
+.form-status.is-error { color: #8b1e24; border: 1px solid #efbdc0; background: #fff0f1; }
+.form-status.is-warning { color: #755400; border: 1px solid #ead18b; background: #fff9e8; }
+.zalo-after-submit { width: 100%; color: #fff; background: #0878c9; }
+.zalo-after-submit[hidden] { display: none; }
+.admin-entry { margin-top: 9px; color: #a9c7e5 !important; font-size: .75rem; }
+@keyframes form-spin { to { transform: rotate(360deg); } }
+
 @media (max-width: 1040px) {
   .header-contact { gap: 14px; }
   .header-contact > span:last-child { display: none; }

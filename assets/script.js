@@ -122,16 +122,79 @@ if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-mot
 }
 
 const consultationForm = document.querySelector('#consultation-form');
-consultationForm?.addEventListener('submit', (event) => {
+const formStatus = document.querySelector('#form-status');
+const zaloAfterSubmit = document.querySelector('#zalo-after-submit');
+const formStartedAt = consultationForm?.querySelector('[name="formStartedAt"]');
+if (formStartedAt) formStartedAt.value = String(Date.now());
+
+function setFormStatus(message, type = '') {
+  if (!formStatus) return;
+  formStatus.textContent = message;
+  formStatus.className = `form-status${type ? ` is-${type}` : ''}`;
+}
+
+consultationForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
+  if (!consultationForm.reportValidity()) return;
+
   const data = new FormData(consultationForm);
-  const name = data.get('name');
-  const phone = data.get('phone');
-  const market = data.get('market');
-  const note = data.get('message') || 'Chưa có lời nhắn thêm.';
-  const subject = encodeURIComponent(`Yêu cầu tư vấn ${market} - ${name}`);
-  const body = encodeURIComponent(`Họ và tên: ${name}\nSố điện thoại: ${phone}\nNội dung quan tâm: ${market}\nLời nhắn: ${note}\n\nGửi từ website TRAENCO Huế.`);
-  window.location.href = `mailto:xkldtraenco@gmail.com?subject=${subject}&body=${body}`;
+  if (data.get('website')) return;
+
+  const config = window.TRAENCO_CONFIG || {};
+  const submitButton = consultationForm.querySelector('.form-submit');
+  const payload = {
+    name: String(data.get('name') || '').trim(),
+    phone: String(data.get('phone') || '').trim(),
+    market: String(data.get('market') || '').trim(),
+    message: String(data.get('message') || '').trim(),
+    consent: data.get('consent') === 'on',
+    formStartedAt: Number(data.get('formStartedAt') || 0),
+    pageUrl: window.location.href
+  };
+
+  if (!/^0\d{9}$/.test(payload.phone.replace(/[ .-]/g, ''))) {
+    setFormStatus('Vui lòng nhập số điện thoại Việt Nam gồm 10 chữ số.', 'error');
+    return;
+  }
+
+  if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
+    setFormStatus('Hệ thống đang chờ kích hoạt cơ sở dữ liệu. Vui lòng nhắn Zalo hoặc gọi hotline để được tư vấn ngay.', 'warning');
+    if (zaloAfterSubmit) zaloAfterSubmit.hidden = false;
+    return;
+  }
+
+  submitButton.disabled = true;
+  submitButton.classList.add('is-loading');
+  setFormStatus('Đang lưu yêu cầu của bạn…');
+
+  try {
+    const response = await fetch(`${config.SUPABASE_URL}/functions/v1/submit-consultation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: config.SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${config.SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || 'Không thể gửi yêu cầu lúc này.');
+
+    setFormStatus('Đã lưu đăng ký thành công. TRAENCO Huế sẽ sớm liên hệ với bạn.', 'success');
+    consultationForm.reset();
+    if (formStartedAt) formStartedAt.value = String(Date.now());
+    if (zaloAfterSubmit) {
+      zaloAfterSubmit.href = config.ZALO_CHAT_URL || 'https://zalo.me/0935398669';
+      zaloAfterSubmit.hidden = false;
+      zaloAfterSubmit.focus({ preventScroll: true });
+    }
+  } catch (error) {
+    setFormStatus(`${error.message} Bạn có thể nhắn Zalo hoặc gọi hotline 0941 945 386.`, 'error');
+    if (zaloAfterSubmit) zaloAfterSubmit.hidden = false;
+  } finally {
+    submitButton.disabled = false;
+    submitButton.classList.remove('is-loading');
+  }
 });
 
 document.querySelector('#year').textContent = new Date().getFullYear();
