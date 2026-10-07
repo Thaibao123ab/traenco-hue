@@ -215,3 +215,45 @@ consultationForm?.addEventListener('submit', async (event) => {
 });
 
 document.querySelector('#year').textContent = new Date().getFullYear();
+
+async function loadPublishedPosts() {
+  const endpoint = window.TRAENCO_CONFIG?.GOOGLE_SHEETS_WEB_APP_URL;
+  const section = document.querySelector('#news');
+  const grid = document.querySelector('#news-grid');
+  if (!endpoint || !section || !grid) return;
+  try {
+    const response = await fetch(`${endpoint}?action=posts`);
+    if (!response.ok) return;
+    const result = await response.json();
+    const posts = Array.isArray(result.posts) ? result.posts : [];
+    if (!posts.length) return;
+    grid.replaceChildren(...posts.slice(0, 9).map((post) => {
+      const article = document.createElement('article');
+      article.className = 'news-card';
+      if (post.image) {
+        const image = document.createElement('img');
+        image.src = post.image;
+        image.alt = '';
+        image.loading = 'lazy';
+        article.append(image);
+      }
+      const body = document.createElement('div');
+      body.className = 'news-card-body';
+      const time = document.createElement('time');
+      time.dateTime = post.publishedAt || '';
+      time.textContent = post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('vi-VN') : 'TRAENCO Huế';
+      const title = document.createElement('h3');
+      title.textContent = post.title || '';
+      const summary = document.createElement('p');
+      summary.textContent = post.summary || '';
+      body.append(time, title, summary);
+      article.append(body);
+      return article;
+    }));
+    section.hidden = false;
+  } catch (error) {
+    console.warn('Không thể tải bài viết', error);
+  }
+}
+
+loadPublishedPosts();
