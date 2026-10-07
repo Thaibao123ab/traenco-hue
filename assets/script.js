@@ -144,6 +144,7 @@ consultationForm?.addEventListener('submit', async (event) => {
   const submitButton = consultationForm.querySelector('.form-submit');
   const payload = {
     name: String(data.get('name') || '').trim(),
+    email: String(data.get('email') || '').trim().toLowerCase(),
     phone: String(data.get('phone') || '').trim(),
     market: String(data.get('market') || '').trim(),
     message: String(data.get('message') || '').trim(),
@@ -157,8 +158,15 @@ consultationForm?.addEventListener('submit', async (event) => {
     return;
   }
 
-  if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
-    setFormStatus('Hệ thống đang chờ kích hoạt cơ sở dữ liệu. Vui lòng nhắn Zalo hoặc gọi hotline để được tư vấn ngay.', 'warning');
+  if (!/^[a-z0-9._%+-]+@gmail\.com$/i.test(payload.email)) {
+    setFormStatus('Vui lòng nhập đúng địa chỉ Gmail, ví dụ tenban@gmail.com.', 'error');
+    return;
+  }
+
+  const hasSheets = Boolean(config.GOOGLE_SHEETS_WEB_APP_URL);
+  const hasSupabase = Boolean(config.SUPABASE_URL && config.SUPABASE_ANON_KEY);
+  if (!hasSheets && !hasSupabase) {
+    setFormStatus('Hệ thống đang chờ kết nối Google Sheets. Vui lòng nhắn Zalo hoặc gọi hotline để được tư vấn ngay.', 'warning');
     if (zaloAfterSubmit) zaloAfterSubmit.hidden = false;
     return;
   }
@@ -168,17 +176,26 @@ consultationForm?.addEventListener('submit', async (event) => {
   setFormStatus('Đang lưu yêu cầu của bạn…');
 
   try {
-    const response = await fetch(`${config.SUPABASE_URL}/functions/v1/submit-consultation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: config.SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${config.SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(payload)
-    });
-    const result = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(result.error || 'Không thể gửi yêu cầu lúc này.');
+    if (hasSheets) {
+      await fetch(config.GOOGLE_SHEETS_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      const response = await fetch(`${config.SUPABASE_URL}/functions/v1/submit-consultation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: config.SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${config.SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'Không thể gửi yêu cầu lúc này.');
+    }
 
     setFormStatus('Đã lưu đăng ký thành công. TRAENCO Huế sẽ sớm liên hệ với bạn.', 'success');
     consultationForm.reset();
