@@ -25,7 +25,7 @@ function cleanText(value: unknown, max: number) {
   return String(value ?? "").trim().replace(/[<>]/g, "").slice(0, max);
 }
 
-async function notifyZaloStaff(lead: { name: string; phone: string; market: string; message: string }) {
+async function notifyZaloStaff(lead: { name: string; email: string; phone: string; market: string; message: string }) {
   const accessToken = Deno.env.get("ZALO_OA_ACCESS_TOKEN");
   const staffUserId = Deno.env.get("ZALO_STAFF_USER_ID");
   if (!accessToken || !staffUserId) return { sent: false, error: "Zalo OA chưa cấu hình" };
@@ -33,6 +33,7 @@ async function notifyZaloStaff(lead: { name: string; phone: string; market: stri
   const text = [
     "🔔 ĐĂNG KÝ TƯ VẤN MỚI - TRAENCO HUẾ",
     `Họ tên: ${lead.name}`,
+    `Gmail: ${lead.email}`,
     `Điện thoại: ${lead.phone}`,
     `Quan tâm: ${lead.market}`,
     `Lời nhắn: ${lead.message || "Không có"}`,
@@ -60,6 +61,7 @@ Deno.serve(async (request) => {
   try {
     const payload = await request.json();
     const name = cleanText(payload.name, 100);
+    const email = cleanText(payload.email, 150).toLowerCase();
     const phone = cleanText(payload.phone, 20).replace(/[ .-]/g, "");
     const market = cleanText(payload.market, 100);
     const message = cleanText(payload.message, 1500);
@@ -67,7 +69,7 @@ Deno.serve(async (request) => {
     const startedAt = Number(payload.formStartedAt || 0);
 
     if (!payload.consent) return json(origin, { error: "Cần đồng ý cho phép liên hệ tư vấn" }, 400);
-    if (name.length < 2 || !/^0\d{9}$/.test(phone) || market.length < 2) {
+    if (name.length < 2 || !/^[a-z0-9._%+-]+@gmail\.com$/i.test(email) || !/^0\d{9}$/.test(phone) || market.length < 2) {
       return json(origin, { error: "Thông tin đăng ký chưa hợp lệ" }, 400);
     }
     if (!startedAt || Date.now() - startedAt < 1500) return json(origin, { error: "Yêu cầu gửi quá nhanh" }, 429);
@@ -88,12 +90,12 @@ Deno.serve(async (request) => {
 
     const { data: lead, error } = await supabase
       .from("consultation_requests")
-      .insert({ name, phone, market, message, page_url: pageUrl, consent: true })
+      .insert({ name, email, phone, market, message, page_url: pageUrl, consent: true })
       .select("id")
       .single();
     if (error) throw error;
 
-    const zalo = await notifyZaloStaff({ name, phone, market, message });
+    const zalo = await notifyZaloStaff({ name, email, phone, market, message });
     await supabase
       .from("consultation_requests")
       .update({ zalo_notified: zalo.sent, zalo_error: zalo.error })
