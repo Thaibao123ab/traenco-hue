@@ -223,6 +223,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .mission-card p { margin: 0; color: var(--muted); font-size: .86rem; }
 .mission-card.accent p { color: #c4d7ef; }
 
+.trust-section { overflow: hidden; background: linear-gradient(180deg, #fff 0%, #edf6ff 100%); }
+.trust-heading { margin-bottom: 34px; }
+.trust-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 245px; gap: 14px; }
+.trust-card { position: relative; overflow: hidden; padding: 0; border: 0; border-radius: 18px; background: #dbe9f7; box-shadow: 0 13px 34px rgba(3,45,94,.12); cursor: zoom-in; text-align: left; }
+.trust-card-featured { grid-column: span 2; grid-row: span 2; }
+.trust-card-portrait { grid-row: span 2; }
+.trust-card::after { content: ""; position: absolute; inset: 42% 0 0; background: linear-gradient(0deg, rgba(2,18,43,.92), transparent); pointer-events: none; }
+.trust-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease, filter .45s ease; }
+.trust-card:hover img { transform: scale(1.035); filter: saturate(1.06); }
+.trust-card > span { position: absolute; z-index: 1; right: 19px; bottom: 17px; left: 19px; display: grid; color: var(--white); }
+.trust-card small { margin-bottom: 4px; color: var(--cyan); font-size: .66rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.trust-card strong { font-size: .96rem; line-height: 1.28; }
+
 .legal-section { padding-block: 72px; border-block: 1px solid var(--line); background: #f4f9ff; }
 .legal-grid { display: grid; grid-template-columns: 1fr 1.12fr; gap: 48px 80px; align-items: center; }
 .legal-brand-banner { grid-column: 1 / -1; margin: 0; padding: clamp(8px, 1.5vw, 16px); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--white); box-shadow: 0 18px 50px rgba(2,61,121,.09); }
@@ -236,6 +249,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .legal-list dt { color: var(--muted); font-size: .8rem; }
 .legal-list dd { margin: 0; font-size: .88rem; font-weight: 700; }
 .legal-link { grid-column: 2; color: var(--blue); text-decoration: underline; text-underline-offset: 5px; font-size: .83rem; font-weight: 700; }
+.legal-documents { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; padding-top: 8px; }
+.legal-document { display: grid; grid-template-rows: 310px auto; overflow: hidden; padding: 0; color: var(--ink); border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 14px 35px rgba(2,61,121,.08); cursor: zoom-in; text-align: left; }
+.legal-document img { width: 100%; height: 100%; object-fit: cover; object-position: top center; background: #f8f5ea; transition: transform .4s ease; }
+.legal-document:hover img { transform: scale(1.02); }
+.legal-document > span { display: grid; min-height: 94px; align-content: center; padding: 17px 18px; border-top: 1px solid var(--line); }
+.legal-document small { margin-bottom: 5px; color: var(--blue-2); font-size: .67rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.legal-document strong { font-size: .87rem; line-height: 1.4; }
 
 .contact { position: relative; overflow: hidden; color: var(--white); background: linear-gradient(135deg, #064b93, #0878c9); }
 .contact::before { content: ""; position: absolute; width: 540px; height: 540px; left: -250px; bottom: -280px; border: 75px solid rgba(96,220,255,.08); border-radius: 50%; }
@@ -283,6 +303,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .gallery-item, .gallery-item.gallery-wide, .gallery-item.gallery-tall { grid-column: span 6; }
   .gallery-proof { grid-template-columns: auto 1fr; }
   .gallery-proof > a { grid-column: 2; width: fit-content; }
+  .trust-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .legal-documents { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .recruitment-grid { grid-template-columns: .9fr 1.1fr; }
 }
 
@@ -338,6 +360,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .recruitment-image { min-height: 500px; margin: 0 calc((100vw - min(680px, calc(100vw - 32px))) / -2); }
   .recruitment-image::after { background: linear-gradient(0deg, var(--blue), transparent 45%); }
   .recruitment-copy { padding: 18px 0 70px; }
+  .trust-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 230px; }
   .legal-list { padding-left: 0; border-left: 0; }
   .legal-link { grid-column: 1; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -397,6 +420,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .recruitment-actions { display: grid; }
   .mission-cards { grid-template-columns: 1fr; }
   .mission-card:first-child { grid-column: auto; }
+  .trust-gallery { grid-template-columns: 1fr; grid-auto-rows: 250px; }
+  .trust-card-featured, .trust-card-portrait { grid-column: auto; grid-row: auto; }
+  .legal-documents { grid-template-columns: 1fr; }
+  .legal-document { grid-template-rows: 285px auto; }
   .legal-heading { align-items: flex-start; }
   .legal-seal { width: 62px; height: 62px; }
   .legal-list > div { grid-template-columns: 1fr; gap: 2px; padding: 11px 0; border-bottom: 1px solid var(--line); }
