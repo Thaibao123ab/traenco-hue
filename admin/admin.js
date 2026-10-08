@@ -6,7 +6,7 @@ const authStatus = document.querySelector('#auth-status');
 if (!config.GOOGLE_ADMIN_WEB_APP_URL) {
   setupWarning.hidden = false;
   adminButton.disabled = true;
-  authStatus.textContent = 'Chưa cần cung cấp Gmail lúc này. Khi có Gmail riêng, hệ thống sẽ được kích hoạt trong vài bước.';
+  authStatus.textContent = 'Hệ thống đang chờ kết nối Google Sheets và đặt mật khẩu quản trị.';
 } else {
   adminButton.addEventListener('click', () => {
     window.location.href = config.GOOGLE_ADMIN_WEB_APP_URL;
