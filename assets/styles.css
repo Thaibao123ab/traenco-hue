@@ -253,9 +253,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .legal-document { display: grid; grid-template-rows: 310px auto; overflow: hidden; padding: 0; color: var(--ink); border: 1px solid var(--line); border-radius: 16px; background: var(--white); box-shadow: 0 14px 35px rgba(2,61,121,.08); cursor: zoom-in; text-align: left; }
 .legal-document img { width: 100%; height: 100%; object-fit: cover; object-position: top center; background: #f8f5ea; transition: transform .4s ease; }
 .legal-document:hover img { transform: scale(1.02); }
-.legal-document > span { display: grid; min-height: 94px; align-content: center; padding: 17px 18px; border-top: 1px solid var(--line); }
+.legal-document > span, .legal-document-copy { display: grid; min-height: 94px; align-content: center; padding: 17px 18px; border-top: 1px solid var(--line); }
 .legal-document small { margin-bottom: 5px; color: var(--blue-2); font-size: .67rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
 .legal-document strong { font-size: .87rem; line-height: 1.4; }
+.legal-document-paged { grid-template-rows: 310px auto auto; cursor: default; }
+.legal-document-view { overflow: hidden; padding: 0; border: 0; background: #f8f5ea; cursor: zoom-in; }
+.legal-document-view img { display: block; }
+.legal-document-copy { min-height: 112px; }
+.legal-page-indicator { margin-top: 8px; color: var(--muted); font-size: .75rem; font-style: normal; font-weight: 700; }
+.legal-page-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px 14px; }
+.legal-page-button { min-height: 42px; padding: 9px 12px; color: var(--blue); border: 1px solid #bfd7ef; border-radius: 10px; background: #eef7ff; font-size: .76rem; font-weight: 800; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.legal-page-button:hover:not(:disabled) { color: var(--white); border-color: var(--blue); background: var(--blue); }
+.legal-page-button:disabled { color: #8da0b5; border-color: #dce5ee; background: #f5f7f9; cursor: not-allowed; }
 
 .contact { position: relative; overflow: hidden; color: var(--white); background: linear-gradient(135deg, #064b93, #0878c9); }
 .contact::before { content: ""; position: absolute; width: 540px; height: 540px; left: -250px; bottom: -280px; border: 75px solid rgba(96,220,255,.08); border-radius: 50%; }

@@ -97,6 +97,43 @@ document.querySelectorAll('[data-lightbox]').forEach((button) => {
   });
 });
 
+document.querySelectorAll('[data-legal-pages]').forEach((documentCard) => {
+  const pages = [
+    {
+      src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-1.png',
+      alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 1',
+      caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 1'
+    },
+    {
+      src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-2.png',
+      alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 2',
+      caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 2'
+    }
+  ];
+  const viewButton = documentCard.querySelector('.legal-document-view');
+  const image = viewButton?.querySelector('img');
+  const indicator = documentCard.querySelector('.legal-page-indicator');
+  const previousButton = documentCard.querySelector('[data-legal-prev]');
+  const nextButton = documentCard.querySelector('[data-legal-next]');
+  let currentPage = 0;
+
+  const showPage = (pageIndex) => {
+    if (!viewButton || !image || !indicator || !previousButton || !nextButton) return;
+    currentPage = Math.max(0, Math.min(pageIndex, pages.length - 1));
+    const page = pages[currentPage];
+    image.src = page.src;
+    image.alt = page.alt;
+    viewButton.dataset.lightbox = page.src;
+    viewButton.dataset.caption = page.caption;
+    indicator.textContent = `Trang ${currentPage + 1}/${pages.length}`;
+    previousButton.disabled = currentPage === 0;
+    nextButton.disabled = currentPage === pages.length - 1;
+  };
+
+  previousButton?.addEventListener('click', () => showPage(currentPage - 1));
+  nextButton?.addEventListener('click', () => showPage(currentPage + 1));
+});
+
 lightbox?.querySelector('.lightbox-close')?.addEventListener('click', () => lightbox.close());
 lightbox?.addEventListener('click', (event) => {
   if (event.target === lightbox) lightbox.close();
