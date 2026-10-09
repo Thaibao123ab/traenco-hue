@@ -86,30 +86,57 @@ document.querySelectorAll('[data-tabs]').forEach((tabsRoot) => {
 const lightbox = document.querySelector('#image-lightbox');
 const lightboxImage = lightbox?.querySelector('img');
 const lightboxCaption = lightbox?.querySelector('p');
+const lightboxPrevious = lightbox?.querySelector('.lightbox-prev');
+const lightboxNext = lightbox?.querySelector('.lightbox-next');
+const legalNoticePages = [
+  {
+    src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-1.png',
+    alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 1',
+    caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 1'
+  },
+  {
+    src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-2.png',
+    alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 2',
+    caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 2'
+  }
+];
+let activeLightboxPages = [];
+let activeLightboxPage = 0;
+
+const showLightboxPage = (pageIndex) => {
+  if (!lightboxImage || !lightboxCaption || !lightboxPrevious || !lightboxNext || !activeLightboxPages.length) return;
+  activeLightboxPage = Math.max(0, Math.min(pageIndex, activeLightboxPages.length - 1));
+  const page = activeLightboxPages[activeLightboxPage];
+  lightboxImage.src = page.src;
+  lightboxImage.alt = page.alt;
+  lightboxCaption.textContent = page.caption;
+  const hasMultiplePages = activeLightboxPages.length > 1;
+  lightboxPrevious.hidden = !hasMultiplePages;
+  lightboxNext.hidden = !hasMultiplePages;
+  lightboxPrevious.disabled = activeLightboxPage === 0;
+  lightboxNext.disabled = activeLightboxPage === activeLightboxPages.length - 1;
+};
 
 document.querySelectorAll('[data-lightbox]').forEach((button) => {
   button.addEventListener('click', () => {
     if (!lightbox || !lightboxImage || !lightboxCaption) return;
-    lightboxImage.src = button.dataset.lightbox;
-    lightboxImage.alt = button.querySelector('img')?.alt || '';
-    lightboxCaption.textContent = button.dataset.caption || '';
+    const isPagedLegalDocument = button.classList.contains('legal-document-view');
+    activeLightboxPages = isPagedLegalDocument ? legalNoticePages : [{
+      src: button.dataset.lightbox,
+      alt: button.querySelector('img')?.alt || '',
+      caption: button.dataset.caption || ''
+    }];
+    const initialPage = Math.max(0, activeLightboxPages.findIndex((page) => page.src === button.dataset.lightbox));
+    showLightboxPage(initialPage);
     lightbox.showModal();
   });
 });
 
+lightboxPrevious?.addEventListener('click', () => showLightboxPage(activeLightboxPage - 1));
+lightboxNext?.addEventListener('click', () => showLightboxPage(activeLightboxPage + 1));
+
 document.querySelectorAll('[data-legal-pages]').forEach((documentCard) => {
-  const pages = [
-    {
-      src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-1.png',
-      alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 1',
-      caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 1'
-    },
-    {
-      src: 'assets/phap-ly-thong-bao-so-noi-vu-hue-trang-2.png',
-      alt: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế, trang 2',
-      caption: 'Thông báo số 2381/TB-SNV của Sở Nội vụ Thành phố Huế về doanh nghiệp hoạt động tuyển chọn lao động đi làm việc ở nước ngoài — Trang 2'
-    }
-  ];
+  const pages = legalNoticePages;
   const viewButton = documentCard.querySelector('.legal-document-view');
   const image = viewButton?.querySelector('img');
   const indicator = documentCard.querySelector('.legal-page-indicator');
@@ -135,6 +162,10 @@ document.querySelectorAll('[data-legal-pages]').forEach((documentCard) => {
 });
 
 lightbox?.querySelector('.lightbox-close')?.addEventListener('click', () => lightbox.close());
+lightbox?.addEventListener('keydown', (event) => {
+  if (event.key === 'ArrowLeft') showLightboxPage(activeLightboxPage - 1);
+  if (event.key === 'ArrowRight') showLightboxPage(activeLightboxPage + 1);
+});
 lightbox?.addEventListener('click', (event) => {
   if (event.target === lightbox) lightbox.close();
 });
